@@ -2,7 +2,8 @@ name: Deploy App Artifacts
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
       - 'apps/app1/**'
       - 'apps/app2/**'
@@ -20,17 +21,18 @@ env:
 jobs:
   build-and-upload:
     runs-on: ubuntu-latest
+    environment: dev
     outputs:
       app1_changed: ${{ steps.filter.outputs.app1 }}
       app2_changed: ${{ steps.filter.outputs.app2 }}
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Detect changed paths
-        uses: dorny/paths-filter@v3
+      - name: Detect changed app paths
         id: filter
+        uses: dorny/paths-filter@v3
         with:
           filters: |
             app1:
@@ -46,58 +48,56 @@ jobs:
 
       - name: Package app1
         if: steps.filter.outputs.app1 == 'true' || github.event_name == 'workflow_dispatch'
-        run: |
-          cd apps/app1
-          zip -r ../../app1.zip .
+        shell: pwsh
+        run: Compress-Archive -Path .\apps\app1\* -DestinationPath .\app1.zip -Force
 
-      - name: Upload app1 artifact
+      - name: Upload app1 to S3
         if: steps.filter.outputs.app1 == 'true' || github.event_name == 'workflow_dispatch'
-        run: |
-          aws s3 cp app1.zip s3://${{ env.ARTIFACT_BUCKET }}/app1/app1.zip
+        run: aws s3 cp ./app1.zip s3://${{ env.ARTIFACT_BUCKET }}/app1/app1.zip
 
       - name: Package app2
         if: steps.filter.outputs.app2 == 'true' || github.event_name == 'workflow_dispatch'
-        run: |
-          cd apps/app2
-          zip -r ../../app2.zip .
+        shell: pwsh
+        run: Compress-Archive -Path .\apps\app2\* -DestinationPath .\app2.zip -Force
 
-      - name: Upload app2 artifact
+      - name: Upload app2 to S3
         if: steps.filter.outputs.app2 == 'true' || github.event_name == 'workflow_dispatch'
-        run: |
-          aws s3 cp app2.zip s3://${{ env.ARTIFACT_BUCKET }}/app2/app2.zip
+        run: aws s3 cp ./app2.zip s3://${{ env.ARTIFACT_BUCKET }}/app2/app2.zip
 
   refresh-app1:
-    runs-on: ubuntu-latest
     needs: build-and-upload
     if: needs.build-and-upload.outputs.app1_changed == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: dev
 
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN_DEV }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: us-east-1
 
       - name: Start app1 instance refresh
         run: |
           aws autoscaling start-instance-refresh \
             --auto-scaling-group-name mbodou-dev-app1-asg \
-            --preferences '{"MinHealthyPercentage":50,"InstanceWarmup":300}'
+            --preferences '{"MinHealthyPercentage":90,"InstanceWarmup":300}'
 
   refresh-app2:
-    runs-on: ubuntu-latest
     needs: build-and-upload
     if: needs.build-and-upload.outputs.app2_changed == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: dev
 
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN_DEV }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: us-east-1
 
       - name: Start app2 instance refresh
         run: |
           aws autoscaling start-instance-refresh \
             --auto-scaling-group-name mbodou-dev-app2-asg \
-            --preferences '{"MinHealthyPercentage":50,"InstanceWarmup":300}'
+            --preferences '{"MinHealthyPercentage":90,"InstanceWarmup":300}'
