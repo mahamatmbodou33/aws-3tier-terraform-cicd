@@ -43,42 +43,50 @@ module "alb" {
 
 module "app1" {
   source                = "../../modules/app"
-  name                  = "${var.project_name}-${var.environment}-app1"
+  name                  = "mbodou-dev-app1"
   app_name              = "app1"
   ami_id                = var.ami_id
   instance_type         = var.instance_type
-  subnet_ids            = module.vpc.private_app_subnet_ids
-  security_group_ids    = [module.security_groups.app_sg_id]
-  target_group_arn      = module.alb.app1_target_group_arn
+  subnet_ids            = module.vpc.private_subnets
+  security_group_ids    = [module.sg.app_sg_id]
+  target_group_arn      = module.alb.target_group_arn_app1
   desired_capacity      = 2
   min_size              = 1
   max_size              = 3
   instance_profile_name = module.iam.instance_profile_name
   artifact_bucket       = aws_s3_bucket.artifacts.bucket
   artifact_key          = "app1/app1.zip"
-  tags                  = local.common_tags
 
-  depends_on = [module.alb]
+  tags = {
+    Project     = "mbodou"
+    Environment = "dev"
+    App         = "app1"
+    ManagedBy   = "Terraform"
+  }
 }
 
 module "app2" {
   source                = "../../modules/app"
-  name                  = "${var.project_name}-${var.environment}-app2"
+  name                  = "mbodou-dev-app2"
   app_name              = "app2"
   ami_id                = var.ami_id
   instance_type         = var.instance_type
-  subnet_ids            = module.vpc.private_app_subnet_ids
-  security_group_ids    = [module.security_groups.app_sg_id]
-  target_group_arn      = module.alb.app2_target_group_arn
+  subnet_ids            = module.vpc.private_subnets
+  security_group_ids    = [module.sg.app_sg_id]
+  target_group_arn      = module.alb.target_group_arn_app2
   desired_capacity      = 2
   min_size              = 1
   max_size              = 3
   instance_profile_name = module.iam.instance_profile_name
   artifact_bucket       = aws_s3_bucket.artifacts.bucket
   artifact_key          = "app2/app2.zip"
-  tags                  = local.common_tags
 
-  depends_on = [module.alb]
+  tags = {
+    Project     = "mbodou"
+    Environment = "dev"
+    App         = "app2"
+    ManagedBy   = "Terraform"
+  }
 }
 
 # RDS
@@ -126,4 +134,14 @@ module "monitoring" {
   alert_email = "mahamatmbodou33@gmail.com"   
   web_acl_name = "three-tier-waf"
   region       = "us-east-1"
+}
+
+## S3 Bucket for Application Artifacts
+resource "aws_s3_bucket" "artifacts" {
+  bucket = "mbodou-dev-artifacts"
+
+  tags = {
+    Name        = "mbodou-dev-artifacts"
+    Environment = "dev"
+  }
 }
