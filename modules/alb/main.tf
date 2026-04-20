@@ -75,85 +75,12 @@ listeners = {
     }
   }
 }
-# listeners = {
-#   http = {
-#     port     = 80
-#       protocol = "HTTP"
-
-#       action_type = "redirect"
-
-#       redirect = {
-#         port        = "443"
-#         protocol    = "HTTPS"
-#         status_code = "HTTP_301"
-#   }
-#   }
-#     https = {
-#       port            = 443
-#       protocol        = "HTTPS"
-#       ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-Res-2021-06"
-#       certificate_arn = var.certificate_arn
-
-#       # 🔴 REQUIRED DEFAULT ACTION
-#       default_action = {
-#         type = "forward"
-
-#         forward = {
-#           target_groups = [
-#             {
-#               target_group_key = "app1"
-#               weight           = 100
-#             }
-#           ]
-#         }
-#       }
-
-#       # 🔥 HOST-BASED ROUTING
-#       rules = {
-#         app1 = {
-#           priority = 1
-
-#           actions = [{
-#             type = "forward"
-
-#             forward = {
-#               target_group_key = "app1"
-#             }
-#           }]
-
-#           conditions = [{
-#             host_header = {
-#               values = ["app1.mbodou.org"]
-#             }
-#           }]
-#         }
-
-#         app2 = {
-#           priority = 2
-
-#           actions = [{
-#             type = "forward"
-
-#             forward = {
-#               target_group_key = "app2"
-#             }
-#           }]
-
-#           conditions = [{
-#             host_header = {
-#               values = ["app2.mbodou.org"]
-#             }
-#           }]
-#         }
-#       }
-#     }
-#   }
 
  target_groups = {
   app1 = {
     name_prefix = "app1-"
     protocol    = "HTTP"
-    port        = 3000   # ✅ MUST match app
+    port        = 80   
     target_type = "instance"
 create_attachment = false 
     health_check = {
@@ -164,7 +91,7 @@ create_attachment = false
   app2 = {
     name_prefix = "app2-"
     protocol    = "HTTP"
-    port        = 3001   # ✅ second app
+    port        = 80  
     target_type = "instance"
 create_attachment = false
     health_check = {

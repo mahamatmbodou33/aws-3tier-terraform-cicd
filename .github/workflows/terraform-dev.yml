@@ -7,7 +7,8 @@ on:
       - 'environments/dev/**'
       - '.github/workflows/terraform-dev.yml'
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
       - 'modules/**'
       - 'environments/dev/**'
@@ -16,6 +17,7 @@ on:
 permissions:
   id-token: write
   contents: read
+  pull-requests: write
 
 env:
   AWS_REGION: us-east-1
@@ -23,11 +25,13 @@ env:
   TF_WORKING_DIR: environments/dev
 
 jobs:
-  validate:
+  terraform-dev:
+    name: Terraform Dev
     runs-on: ubuntu-latest
+    environment: dev
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Terraform
@@ -35,18 +39,18 @@ jobs:
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN_DEV }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
       - name: Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init -input=false
-
-      - name: Terraform Fmt
-        run: terraform fmt -check -recursive
 
       - name: Terraform Validate
         working-directory: ${{ env.TF_WORKING_DIR }}
@@ -56,6 +60,13 @@ jobs:
         if: github.event_name == 'pull_request'
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform plan -input=false -no-color -out=tfplan
+
+      - name: Upload plan artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-dev-plan
+          path: ${{ env.TF_WORKING_DIR }}/tfplan
 
       - name: Terraform Apply
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

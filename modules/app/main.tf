@@ -9,15 +9,15 @@ resource "aws_launch_template" "this" {
 
   vpc_security_group_ids = var.security_group_ids
 
-  user_data = base64encode(templatefile("${path.module}/user_data.sh", {
-    artifact_bucket = var.artifact_bucket
-    artifact_key    = var.artifact_key
-    app_name        = var.app_name
-    user_data_extra = var.user_data_extra
-  }))
+ user_data = base64encode(templatefile("${path.module}/user_data.sh", {
+  artifact_bucket = var.artifact_bucket
+  artifact_key    = var.artifact_key
+  app_name        = var.app_name
+}))
 
   tag_specifications {
     resource_type = "instance"
+
     tags = merge(var.tags, {
       Name = "${var.name}-instance"
       App  = var.app_name
@@ -57,7 +57,7 @@ resource "aws_autoscaling_group" "this" {
       instance_warmup        = 300
     }
 
-    triggers = ["launch_template"]
+    
   }
 
   tag {
@@ -67,7 +67,10 @@ resource "aws_autoscaling_group" "this" {
   }
 
   dynamic "tag" {
-    for_each = merge(var.tags, { App = var.app_name })
+    for_each = merge(var.tags, {
+      App = var.app_name
+    })
+
     content {
       key                 = tag.key
       value               = tag.value

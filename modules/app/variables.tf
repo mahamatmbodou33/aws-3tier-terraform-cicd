@@ -113,7 +113,5 @@ variable "tags" {
 #   type        = string
 # }
 
-variable "name" {
-  type = string
-}
+
 
