@@ -64,7 +64,7 @@ jobs:
         if: steps.filter.outputs.app2 == 'true' || github.event_name == 'workflow_dispatch'
         run: aws s3 cp ./app2.zip s3://${{ env.ARTIFACT_BUCKET }}/app2/app2.zip
 
-    refresh-app1:
+  refresh-app1:
     needs: build-and-upload
     if: needs.build-and-upload.outputs.app1_changed == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
@@ -98,7 +98,7 @@ jobs:
             --region us-east-1 \
             --preferences '{"MinHealthyPercentage":90,"InstanceWarmup":300}'
 
-    refresh-app2:
+  refresh-app2:
     needs: build-and-upload
     if: needs.build-and-upload.outputs.app2_changed == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
