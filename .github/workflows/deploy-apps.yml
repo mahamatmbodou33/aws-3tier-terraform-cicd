@@ -64,7 +64,7 @@ jobs:
         if: steps.filter.outputs.app2 == 'true' || github.event_name == 'workflow_dispatch'
         run: aws s3 cp ./app2.zip s3://${{ env.ARTIFACT_BUCKET }}/app2/app2.zip
 
-  refresh-app1:
+    refresh-app1:
     needs: build-and-upload
     if: needs.build-and-upload.outputs.app1_changed == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
@@ -77,13 +77,28 @@ jobs:
           role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN_DEV }}
           aws-region: us-east-1
 
-      - name: Start app1 instance refresh
+      - name: Start app1 instance refresh if none is running
+        shell: bash
         run: |
+          STATUS=$(aws autoscaling describe-instance-refreshes \
+            --auto-scaling-group-name mbodou-dev-app1-asg \
+            --region us-east-1 \
+            --query 'InstanceRefreshes[0].Status' \
+            --output text 2>/dev/null || echo "NONE")
+
+          echo "Current app1 refresh status: $STATUS"
+
+          if [ "$STATUS" = "InProgress" ] || [ "$STATUS" = "Pending" ]; then
+            echo "Instance refresh already running for app1. Skipping new refresh."
+            exit 0
+          fi
+
           aws autoscaling start-instance-refresh \
             --auto-scaling-group-name mbodou-dev-app1-asg \
+            --region us-east-1 \
             --preferences '{"MinHealthyPercentage":90,"InstanceWarmup":300}'
 
-  refresh-app2:
+    refresh-app2:
     needs: build-and-upload
     if: needs.build-and-upload.outputs.app2_changed == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
@@ -96,8 +111,23 @@ jobs:
           role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN_DEV }}
           aws-region: us-east-1
 
-      - name: Start app2 instance refresh
+      - name: Start app2 instance refresh if none is running
+        shell: bash
         run: |
+          STATUS=$(aws autoscaling describe-instance-refreshes \
+            --auto-scaling-group-name mbodou-dev-app2-asg \
+            --region us-east-1 \
+            --query 'InstanceRefreshes[0].Status' \
+            --output text 2>/dev/null || echo "NONE")
+
+          echo "Current app2 refresh status: $STATUS"
+
+          if [ "$STATUS" = "InProgress" ] || [ "$STATUS" = "Pending" ]; then
+            echo "Instance refresh already running for app2. Skipping new refresh."
+            exit 0
+          fi
+
           aws autoscaling start-instance-refresh \
             --auto-scaling-group-name mbodou-dev-app2-asg \
+            --region us-east-1 \
             --preferences '{"MinHealthyPercentage":90,"InstanceWarmup":300}'
