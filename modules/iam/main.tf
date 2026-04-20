@@ -1,4 +1,28 @@
 data "aws_caller_identity" "current" {}
+resource "aws_iam_role" "github_actions_role" {
+  name = "${var.project_name}-${var.environment}-github-actions-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.github.arn
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+          }
+          StringLike = {
+            "token.actions.githubusercontent.com:sub" = "repo:${var.github_owner}/${var.github_repo}:*"
+          }
+        }
+      }
+    ]
+  })
+}
 
 resource "aws_iam_role" "ec2_app_role" {
   name = "${var.project_name}-${var.environment}-ec2-app-role"
@@ -61,31 +85,31 @@ resource "aws_iam_openid_connect_provider" "github" {
   ]
 }
 
-resource "aws_iam_role" "github_actions_role" {
-  name = "${var.project_name}-${var.environment}-github-actions-role"
+# resource "aws_iam_role" "github_actions_role" {
+#   name = "${var.project_name}-${var.environment}-github-actions-role"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Federated = aws_iam_openid_connect_provider.github.arn
-      }
-      Action = "sts:AssumeRoleWithWebIdentity"
-      Condition = {
-        StringEquals = {
-          "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-        }
-        StringLike = {
-          "token.actions.githubusercontent.com:sub" = [
-            "repo:${var.github_owner}/${var.github_repo}:ref:refs/heads/main",
-            "repo:${var.github_owner}/${var.github_repo}:pull_request"
-          ]
-        }
-      }
-    }]
-  })
-}
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [{
+#       Effect = "Allow"
+#       Principal = {
+#         Federated = aws_iam_openid_connect_provider.github.arn
+#       }
+#       Action = "sts:AssumeRoleWithWebIdentity"
+#       Condition = {
+#         StringEquals = {
+#           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+#         }
+#         StringLike = {
+#           "token.actions.githubusercontent.com:sub" = [
+#             "repo:${var.github_owner}/${var.github_repo}:ref:refs/heads/main",
+#             "repo:${var.github_owner}/${var.github_repo}:pull_request"
+#           ]
+#         }
+#       }
+#     }]
+#   })
+# }
 
 resource "aws_iam_policy" "github_actions_policy" {
   name = "${var.project_name}-${var.environment}-github-actions-policy"
