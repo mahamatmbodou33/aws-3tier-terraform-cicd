@@ -115,3 +115,10 @@ variable "github_owner" {
 variable "github_repo" {
   type = string
 }
+variable "alert_email" {
+  type = string
+}
+
+# variable "web_acl_name" {
+#   type = string
+# }

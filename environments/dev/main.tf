@@ -119,7 +119,7 @@ module "route53_dns" {
   alb_zone_id  = module.alb.zone_id
 }
 
-# WAF
+# WAF for ALB
 module "waf" {
   source = "../../modules/WAF"
 
@@ -131,9 +131,18 @@ module "waf" {
 module "monitoring" {
   source = "../../modules/monitoring"
 
-  alert_email = "mahamatmbodou33@gmail.com"   
-  web_acl_name = "three-tier-waf"
-  region       = "us-east-1"
+  project_name                  = var.project_name
+  environment                   = var.environment
+  alb_arn_suffix                = module.alb.alb_arn_suffix
+  app1_target_group_arn_suffix  = module.alb.target_group_arn_suffix_app1
+  app2_target_group_arn_suffix  = module.alb.target_group_arn_suffix_app2
+  web_acl_name                  = module.waf.web_acl_name
+  alert_email                   = var.alert_email
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+  }
 }
 
 ## S3 Bucket for Application Artifacts
