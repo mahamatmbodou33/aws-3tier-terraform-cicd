@@ -107,7 +107,10 @@ resource "aws_iam_policy" "github_actions_policy" {
           "iam:GetInstanceProfile",
           "iam:CreateServiceLinkedRole",
           "s3:*",
-          "dynamodb:*"
+          "dynamodb:*",
+          "iam:*",
+          "rds:*",
+          "sns:*"
         ]
         Resource = "*"
       }
