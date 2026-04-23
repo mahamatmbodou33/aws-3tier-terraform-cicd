@@ -50,8 +50,13 @@ jobs:
 
       - name: Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform init -reconfigure -input=false -backend-config="backend-dev.hcl"
-
+        run: terraform init -reconfigure -input=false -backend-config="./backend-dev.hcl"
+      - name: Debug backend files
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          pwd
+          ls -la
+          cat backend-dev.hcl
       - name: Terraform Validate
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform validate
