@@ -18,5 +18,5 @@ resource "aws_db_instance" "db" {
   vpc_security_group_ids = [var.db_sg_id]
 
   skip_final_snapshot = true
-  tags = var.tags
+  tags                = var.tags
 }

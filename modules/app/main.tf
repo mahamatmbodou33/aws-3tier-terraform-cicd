@@ -9,11 +9,11 @@ resource "aws_launch_template" "this" {
 
   vpc_security_group_ids = var.security_group_ids
 
- user_data = base64encode(templatefile("${path.module}/user_data.sh", {
-  artifact_bucket = var.artifact_bucket
-  artifact_key    = var.artifact_key
-  app_name        = var.app_name
-}))
+  user_data = base64encode(templatefile("${path.module}/user_data.sh", {
+    artifact_bucket = var.artifact_bucket
+    artifact_key    = var.artifact_key
+    app_name        = var.app_name
+  }))
 
   tag_specifications {
     resource_type = "instance"
@@ -57,7 +57,7 @@ resource "aws_autoscaling_group" "this" {
       instance_warmup        = 300
     }
 
-    
+
   }
 
   tag {
@@ -83,10 +83,10 @@ resource "aws_autoscaling_group" "this" {
   }
 }
 # resource "aws_launch_template" "app" {
-    
+
 
 #   # name = var.name
-  
+
 #   image_id      = "ami-0c3389a4fa5bddaad" # Replace with valid AMI
 #   instance_type = "t2.micro"
 
@@ -102,7 +102,7 @@ resource "aws_autoscaling_group" "this" {
 #   APP_MESSAGE = var.app_message
 #   APP_VERSION = var.app_version
 # }))
- 
+
 #   tag_specifications {
 #   resource_type = "instance"
 

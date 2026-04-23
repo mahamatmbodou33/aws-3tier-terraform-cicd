@@ -2,7 +2,7 @@ resource "aws_route53_record" "root" {
   zone_id = var.zone_id
   name    = "mbodou.org"
   type    = "A"
-  
+
   alias {
     name                   = var.alb_dns_name
     zone_id                = var.alb_zone_id

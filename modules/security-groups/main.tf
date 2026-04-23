@@ -4,9 +4,9 @@
 resource "aws_security_group" "alb_sg" {
   name        = "alb-sg"
   description = "Allow HTTP/HTTPS from internet"
-  vpc_id = var.vpc_id
+  vpc_id      = var.vpc_id
 
-# Ingress Rules AND CIDR Block
+  # Ingress Rules AND CIDR Block
   ingress {
     from_port   = 80
     to_port     = 80
@@ -21,7 +21,7 @@ resource "aws_security_group" "alb_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-#Egress Rules - all-all open
+  #Egress Rules - all-all open
   egress {
     from_port   = 0
     to_port     = 0

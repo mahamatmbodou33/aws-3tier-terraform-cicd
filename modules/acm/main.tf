@@ -1,7 +1,7 @@
 resource "aws_acm_certificate" "this" {
   domain_name               = "mbodou.org"
   subject_alternative_names = ["*.mbodou.org"]
-  validation_method = "DNS"
+  validation_method         = "DNS"
 
   tags = var.tags
 
@@ -19,10 +19,10 @@ resource "aws_route53_record" "validation" {
 
   zone_id = var.zone_id
 
-  name    = each.value.resource_record_name
-  type    = each.value.resource_record_type
-  records = [each.value.resource_record_value]
-  ttl     = 60
+  name            = each.value.resource_record_name
+  type            = each.value.resource_record_type
+  records         = [each.value.resource_record_value]
+  ttl             = 60
   allow_overwrite = true
 }
 

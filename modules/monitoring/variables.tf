@@ -27,7 +27,7 @@ variable "alert_email" {
 }
 
 variable "instance_ids" {
-  type = list(string)
+  type    = list(string)
   default = []
 }
 

@@ -1,17 +1,17 @@
 module "vpc" {
-  source = "../../modules/vpc"
-  vpc_name = "${local.name_prefix}-vpc"
-  vpc_cidr_block = var.vpc_cidr_block
-  vpc_availability_zones = var.vpc_availability_zones
-  vpc_public_subnets = var.vpc_public_subnets
-  vpc_private_subnets = var.vpc_private_subnets
-  vpc_database_subnets = var.vpc_database_subnets
-  vpc_create_database_subnet_group = var.vpc_create_database_subnet_group
+  source                                 = "../../modules/vpc"
+  vpc_name                               = "${local.name_prefix}-vpc"
+  vpc_cidr_block                         = var.vpc_cidr_block
+  vpc_availability_zones                 = var.vpc_availability_zones
+  vpc_public_subnets                     = var.vpc_public_subnets
+  vpc_private_subnets                    = var.vpc_private_subnets
+  vpc_database_subnets                   = var.vpc_database_subnets
+  vpc_create_database_subnet_group       = var.vpc_create_database_subnet_group
   vpc_create_database_subnet_route_table = var.vpc_create_database_subnet_route_table
-  vpc_enable_nat_gateway = var.vpc_enable_nat_gateway
-  vpc_single_nat_gateway = var.vpc_single_nat_gateway
-  
-tags = local.common_tags
+  vpc_enable_nat_gateway                 = var.vpc_enable_nat_gateway
+  vpc_single_nat_gateway                 = var.vpc_single_nat_gateway
+
+  tags = local.common_tags
 }
 
 # IAM MODULES
@@ -32,13 +32,13 @@ module "sg" {
 }
 # ALB
 module "alb" {
-  source = "../../modules/alb"
-  name = "${local.name_prefix}-alb"
-  vpc_id         = module.vpc.vpc_id
-  public_subnets = module.vpc.public_subnets
-  alb_sg_id      = module.sg.alb_sg_id
+  source          = "../../modules/alb"
+  name            = "${local.name_prefix}-alb"
+  vpc_id          = module.vpc.vpc_id
+  public_subnets  = module.vpc.public_subnets
+  alb_sg_id       = module.sg.alb_sg_id
   certificate_arn = module.acm.certificate_arn
-  tags = local.common_tags
+  tags            = local.common_tags
 }
 
 module "app1" {
@@ -91,11 +91,11 @@ module "app2" {
 
 # RDS
 module "rds" {
-  source = "../../modules/rds"
-  name = "${local.name_prefix}-db"
+  source     = "../../modules/rds"
+  name       = "${local.name_prefix}-db"
   db_subnets = module.vpc.database_subnets
   db_sg_id   = module.sg.db_sg_id
-  tags = local.common_tags
+  tags       = local.common_tags
 }
 
 ## ACM Certificate for ALB
@@ -131,13 +131,13 @@ module "waf" {
 module "monitoring" {
   source = "../../modules/monitoring"
 
-  project_name                  = var.project_name
-  environment                   = var.environment
-  alb_arn_suffix                = module.alb.alb_arn_suffix
-  app1_target_group_arn_suffix  = module.alb.target_group_arn_suffix_app1
-  app2_target_group_arn_suffix  = module.alb.target_group_arn_suffix_app2
-  web_acl_name                  = module.waf.web_acl_name
-  alert_email                   = var.alert_email
+  project_name                 = var.project_name
+  environment                  = var.environment
+  alb_arn_suffix               = module.alb.alb_arn_suffix
+  app1_target_group_arn_suffix = module.alb.target_group_arn_suffix_app1
+  app2_target_group_arn_suffix = module.alb.target_group_arn_suffix_app2
+  web_acl_name                 = module.waf.web_acl_name
+  alert_email                  = var.alert_email
 
   tags = {
     Project     = var.project_name

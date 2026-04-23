@@ -86,7 +86,7 @@ variable "tags" {
 # # Optional variables for app configuration
 # variable "app_name" {
 #   description = "Name of the application"
-  
+
 # }
 # variable "app_message" {
 #   description = "Message for the application"
@@ -94,7 +94,7 @@ variable "tags" {
 # }
 # variable "app_port" {
 #   description = "Port for the application"
- 
+
 # }
 # variable "ami_id" {
 #   description = "AMI ID for the app instances"
