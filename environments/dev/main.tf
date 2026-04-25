@@ -86,6 +86,7 @@ module "app2" {
     Environment = "dev"
     App         = "app2"
     ManagedBy   = "Terraform"
+    TestRun =  "final-ci-cd-test"
   }
 }
 
