@@ -73,3 +73,10 @@ variable "vpc_single_nat_gateway" {
 variable "tags" {
   type = map(string)
 }
+variable "project_name" {
+  type = string
+}
+
+variable "environment" {
+  type = string
+}

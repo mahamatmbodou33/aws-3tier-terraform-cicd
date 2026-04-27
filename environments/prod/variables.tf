@@ -122,4 +122,3 @@ variable "alert_email" {
 # variable "web_acl_name" {
 #   type = string
 # }
-

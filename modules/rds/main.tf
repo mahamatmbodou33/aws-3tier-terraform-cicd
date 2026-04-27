@@ -1,5 +1,5 @@
 resource "aws_db_subnet_group" "db" {
-  name       = "db-subnet-group"
+  name       = "${var.project_name}-${var.environment}-db-subnet-group"
   subnet_ids = var.db_subnets
 }
 
