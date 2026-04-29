@@ -60,11 +60,11 @@ resource "aws_autoscaling_group" "this" {
 
   }
 
-  tag {
-    key                 = "Name"
-    value               = "${var.name}-asg-instance"
-    propagate_at_launch = true
-  }
+ tag {
+  key                 = "TestRun"
+  value               = "prod-pipeline-test"
+  propagate_at_launch = true
+}
 
   dynamic "tag" {
     for_each = merge(var.tags, {
