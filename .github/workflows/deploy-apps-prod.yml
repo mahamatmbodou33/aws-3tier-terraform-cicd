@@ -104,7 +104,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN_PROD }}
           aws-region: us-east-1
 
-      - name: Refresh app2 ASG safely
+     - name: Refresh app2 ASG safely
   shell: bash
   run: |
     STATUS=$(aws autoscaling describe-instance-refreshes \
