@@ -16,12 +16,12 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
-  ARTIFACT_BUCKET: mbodou-prod-artifacts
+  ARTIFACT_BUCKET: mbodou-dev-artifacts
 
 jobs:
   build-and-upload:
     runs-on: ubuntu-latest
-    environment: production
+    environment: dev
     outputs:
       app1_changed: ${{ steps.filter.outputs.app1 }}
       app2_changed: ${{ steps.filter.outputs.app2 }}
@@ -43,7 +43,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN_PROD }}
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN_DEV }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Package app1
@@ -64,24 +64,24 @@ jobs:
         if: steps.filter.outputs.app2 == 'true' || github.event_name == 'workflow_dispatch'
         run: aws s3 cp ./app2.zip s3://${{ env.ARTIFACT_BUCKET }}/app2/app2.zip
 
-  refresh-app1:
+    refresh-app1:
     needs: build-and-upload
     if: needs.build-and-upload.outputs.app1_changed == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    environment: production
+    environment: dev
 
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN_PROD }}
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN_DEV }}
           aws-region: us-east-1
 
       - name: Start app1 instance refresh if none is running
         shell: bash
         run: |
           STATUS=$(aws autoscaling describe-instance-refreshes \
-            --auto-scaling-group-name mbodou-prod-app1-asg \
+            --auto-scaling-group-name mbodou-dev-app1-asg \
             --region us-east-1 \
             --query 'InstanceRefreshes[0].Status' \
             --output text 2>/dev/null || echo "NONE")
@@ -94,28 +94,28 @@ jobs:
           fi
 
           aws autoscaling start-instance-refresh \
-            --auto-scaling-group-name mbodou-prod-app1-asg \
+            --auto-scaling-group-name mbodou-dev-app1-asg \
             --region us-east-1 \
             --preferences '{"MinHealthyPercentage":90,"InstanceWarmup":300}'
 
-  refresh-app2:
+    refresh-app2:
     needs: build-and-upload
     if: needs.build-and-upload.outputs.app2_changed == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    environment: production
+    environment: dev
 
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN_PROD }}
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN_DEV }}
           aws-region: us-east-1
 
       - name: Start app2 instance refresh if none is running
         shell: bash
         run: |
           STATUS=$(aws autoscaling describe-instance-refreshes \
-            --auto-scaling-group-name mbodou-prod-app2-asg \
+            --auto-scaling-group-name mbodou-dev-app2-asg \
             --region us-east-1 \
             --query 'InstanceRefreshes[0].Status' \
             --output text 2>/dev/null || echo "NONE")
@@ -128,6 +128,6 @@ jobs:
           fi
 
           aws autoscaling start-instance-refresh \
-            --auto-scaling-group-name mbodou-prod-app2-asg \
+            --auto-scaling-group-name mbodou-dev-app2-asg \
             --region us-east-1 \
             --preferences '{"MinHealthyPercentage":90,"InstanceWarmup":300}'
