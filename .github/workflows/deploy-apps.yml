@@ -68,7 +68,7 @@ jobs:
     needs: build-and-upload
     if: needs.build-and-upload.outputs.app1_changed == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    environment: dev
+    environment: production
 
     steps:
       - name: Configure AWS credentials
@@ -102,7 +102,7 @@ jobs:
     needs: build-and-upload
     if: needs.build-and-upload.outputs.app2_changed == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    environment: dev
+    environment: production
 
     steps:
       - name: Configure AWS credentials
