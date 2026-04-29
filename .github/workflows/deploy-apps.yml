@@ -16,7 +16,7 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
-  ARTIFACT_BUCKET: mbodou-dev-artifacts
+  ARTIFACT_BUCKET: mbodou-prod-artifacts
 
 jobs:
   build-and-upload:
