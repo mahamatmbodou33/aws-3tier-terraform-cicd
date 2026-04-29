@@ -12,12 +12,13 @@ env:
   ARTIFACT_BUCKET: three-tier-app-prod-artifacts
 
 jobs:
-  deploy-prod-apps:
+  deploy-app1:
+    name: Deploy App1
     runs-on: ubuntu-latest
     environment: production
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Configure AWS credentials
@@ -30,24 +31,39 @@ jobs:
         shell: pwsh
         run: Compress-Archive -Path ./apps/app1/* -DestinationPath ./app1.zip -Force
 
-      - name: Upload app1 to prod S3
+      - name: Upload app1 to S3
         run: aws s3 cp ./app1.zip s3://${{ env.ARTIFACT_BUCKET }}/app1/app1.zip
 
-      - name: Package app2
-        shell: pwsh
-        run: Compress-Archive -Path ./apps/app2/* -DestinationPath ./app2.zip -Force
-
-      - name: Upload app2 to prod S3
-        run: aws s3 cp ./app2.zip s3://${{ env.ARTIFACT_BUCKET }}/app2/app2.zip
-
-      - name: Start app1 prod instance refresh
+      - name: Refresh app1 ASG
         run: |
           aws autoscaling start-instance-refresh \
             --auto-scaling-group-name three-tier-app-prod-app1-asg \
             --region us-east-1 \
             --preferences '{"MinHealthyPercentage":90,"InstanceWarmup":300}' || true
 
-      - name: Start app2 prod instance refresh
+  deploy-app2:
+    name: Deploy App2
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Package app2
+        shell: pwsh
+        run: Compress-Archive -Path ./apps/app2/* -DestinationPath ./app2.zip -Force
+
+      - name: Upload app2 to S3
+        run: aws s3 cp ./app2.zip s3://${{ env.ARTIFACT_BUCKET }}/app2/app2.zip
+
+      - name: Refresh app2 ASG
         run: |
           aws autoscaling start-instance-refresh \
             --auto-scaling-group-name three-tier-app-prod-app2-asg \
