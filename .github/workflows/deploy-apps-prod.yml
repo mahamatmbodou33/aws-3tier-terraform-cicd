@@ -1,4 +1,4 @@
-name: Deploy App Artifacts Prod
+name: Deploy App Artifacts
 
 on:
   workflow_dispatch:
