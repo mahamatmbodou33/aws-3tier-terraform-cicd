@@ -35,7 +35,9 @@ module "sg" {
 # ALB
 module "alb" {
   source          = "../../modules/alb"
-  name            = "${local.name_prefix}-alb"
+  project_name    = var.project_name
+  environment     = var.environment
+  name            = "${var.project_name}-${var.environment}-alb"
   vpc_id          = module.vpc.vpc_id
   public_subnets  = module.vpc.public_subnets
   alb_sg_id       = module.sg.alb_sg_id
@@ -45,7 +47,7 @@ module "alb" {
 
 module "app1" {
   source                = "../../modules/app"
-  name                  = "mbodou-dev-app1"
+  name                  = "${var.project_name}-${var.environment}-app1"
   app_name              = "app1"
   ami_id                = var.ami_id
   instance_type         = var.instance_type
@@ -61,15 +63,16 @@ module "app1" {
 
   tags = {
     Project     = "mbodou"
-    Environment = "dev"
+    Environment = var.environment
     App         = "app1"
     ManagedBy   = "Terraform"
   }
 }
 
+
 module "app2" {
   source                = "../../modules/app"
-  name                  = "mbodou-dev-app2"
+  name                  = "${var.project_name}-${var.environment}-app2"
   app_name              = "app2"
   ami_id                = var.ami_id
   instance_type         = var.instance_type
@@ -85,7 +88,7 @@ module "app2" {
 
   tags = {
     Project     = "mbodou"
-    Environment = "dev"
+    Environment = var.environment
     App         = "app2"
     ManagedBy   = "Terraform"
     TestRun     = "final-ci-cd-test-1"
@@ -94,11 +97,13 @@ module "app2" {
 
 # RDS
 module "rds" {
-  source     = "../../modules/rds"
-  name       = "${local.name_prefix}-db"
-  db_subnets = module.vpc.database_subnets
-  db_sg_id   = module.sg.db_sg_id
-  tags       = local.common_tags
+  source       = "../../modules/rds"
+  project_name = var.project_name
+  environment  = var.environment
+  name         = "${local.name_prefix}-db"
+  db_subnets   = module.vpc.database_subnets
+  db_sg_id     = module.sg.db_sg_id
+  tags         = local.common_tags
 }
 
 ## ACM Certificate for ALB
@@ -124,10 +129,11 @@ module "route53_dns" {
 
 # WAF for ALB
 module "waf" {
-  source = "../../modules/WAF"
-
-  name    = "three-tier-waf"
-  alb_arn = module.alb.alb_arn
+  source       = "../../modules/WAF"
+  project_name = var.project_name
+  environment  = var.environment
+  name         = "${var.project_name}-${var.environment}-waf"
+  alb_arn      = module.alb.alb_arn
 }
 
 # Monitoring and Alerting
@@ -150,10 +156,10 @@ module "monitoring" {
 
 ## S3 Bucket for Application Artifacts
 resource "aws_s3_bucket" "artifacts" {
-  bucket = "mbodou-dev-artifacts"
+  bucket = "${var.project_name}-${var.environment}-artifacts"
 
   tags = {
-    Name        = "mbodou-dev-artifacts"
-    Environment = "dev"
+    Name        = "${var.project_name}-${var.environment}-artifacts"
+    Environment = var.environment
   }
 }

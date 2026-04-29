@@ -1,4 +1,6 @@
 ## VPC Variables
+project_name                           = "three-tier-app"
+environment                            = "dev"
 vpc_name                               = "my-vpc"
 vpc_cidr_block                         = "10.0.0.0/16"
 vpc_availability_zones                 = ["us-east-1a", "us-east-1b", "us-east-1c"]
