@@ -19,12 +19,13 @@ module "vpc" {
 # IAM MODULES
 
 module "iam" {
-  source              = "../../modules/iam"
+  source = "../../modules/iam"
+
   project_name        = var.project_name
   environment         = var.environment
-  artifact_bucket_arn = aws_s3_bucket.artifacts.arn
   github_owner        = var.github_owner
   github_repo         = var.github_repo
+  artifact_bucket_arn = aws_s3_bucket.artifacts.arn
 }
 
 module "sg" {
