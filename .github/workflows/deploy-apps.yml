@@ -81,7 +81,7 @@ jobs:
         shell: bash
         run: |
           STATUS=$(aws autoscaling describe-instance-refreshes \
-            --auto-scaling-group-name mbodou-dev-app1-asg \
+            --auto-scaling-group-name mbodou-prod-app1-asg \
             --region us-east-1 \
             --query 'InstanceRefreshes[0].Status' \
             --output text 2>/dev/null || echo "NONE")
@@ -94,7 +94,7 @@ jobs:
           fi
 
           aws autoscaling start-instance-refresh \
-            --auto-scaling-group-name mbodou-dev-app1-asg \
+            --auto-scaling-group-name mbodou-prod-app1-asg \
             --region us-east-1 \
             --preferences '{"MinHealthyPercentage":90,"InstanceWarmup":300}'
 
@@ -108,14 +108,14 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN_DEV }}
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN_PROD }}
           aws-region: us-east-1
 
       - name: Start app2 instance refresh if none is running
         shell: bash
         run: |
           STATUS=$(aws autoscaling describe-instance-refreshes \
-            --auto-scaling-group-name mbodou-dev-app2-asg \
+            --auto-scaling-group-name mbodou-prod-app2-asg \
             --region us-east-1 \
             --query 'InstanceRefreshes[0].Status' \
             --output text 2>/dev/null || echo "NONE")
@@ -128,6 +128,6 @@ jobs:
           fi
 
           aws autoscaling start-instance-refresh \
-            --auto-scaling-group-name mbodou-dev-app2-asg \
+            --auto-scaling-group-name mbodou-prod-app2-asg \
             --region us-east-1 \
             --preferences '{"MinHealthyPercentage":90,"InstanceWarmup":300}'
