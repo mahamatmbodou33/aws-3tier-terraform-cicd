@@ -67,7 +67,7 @@ module "app1" {
     Environment = var.environment
     App         = "app1"
     ManagedBy   = "Terraform"
-    TestRun     = "prod-pipeline-test"
+    TestRun     = "prod-v1-pipeline-test"
   }
 }
 
@@ -93,7 +93,7 @@ module "app2" {
     Environment = var.environment
     App         = "app2"
     ManagedBy   = "Terraform"
-    TestRun     = "prod-pipeline-test"
+    TestRun     = "prod-v1-pipeline-test"
   }
 }
 
