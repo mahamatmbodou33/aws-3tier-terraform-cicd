@@ -62,7 +62,7 @@ resource "aws_autoscaling_group" "this" {
 
   tag {
     key                 = "TestRun"
-    value               = "prod-pipeline-test"
+    value               = "pro-pipeline-test"
     propagate_at_launch = true
   }
 
