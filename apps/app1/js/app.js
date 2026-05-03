@@ -1,4 +1,1 @@
-function showMessage() {
-  document.getElementById("message").innerText =
-    "App1 is healthy and running successfully.";
-}
+console.log("Mbodou Abakar Mahamat | AWS Cloud Portfolio loaded successfully.");
