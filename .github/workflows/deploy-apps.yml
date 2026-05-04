@@ -16,7 +16,7 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
-  ARTIFACT_BUCKET: mbodou-dev-artifacts
+  ARTIFACT_BUCKET: three-tier-app-dev-artifacts
   APP1_ASG_NAME: three-tier-app-dev-app1-asg
   APP2_ASG_NAME: three-tier-app-dev-app2-asg
 
