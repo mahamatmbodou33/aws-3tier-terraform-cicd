@@ -1,4 +1,4 @@
-name: Deploy App Artifacts
+name: Deploy App Artifacts Dev
 
 on:
   push:
