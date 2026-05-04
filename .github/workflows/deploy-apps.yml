@@ -17,28 +17,18 @@ permissions:
 env:
   AWS_REGION: us-east-1
   ARTIFACT_BUCKET: mbodou-dev-artifacts
+  APP1_ASG_NAME: three-tier-app-dev-app1-asg
+  APP2_ASG_NAME: three-tier-app-dev-app2-asg
 
 jobs:
   build-and-upload:
+    name: Build and Upload Artifacts
     runs-on: ubuntu-latest
     environment: dev
-    outputs:
-      app1_changed: ${{ steps.filter.outputs.app1 }}
-      app2_changed: ${{ steps.filter.outputs.app2 }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Detect changed app paths
-        id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            app1:
-              - 'apps/app1/**'
-            app2:
-              - 'apps/app2/**'
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -47,24 +37,21 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Package app1
-        if: steps.filter.outputs.app1 == 'true' || github.event_name == 'workflow_dispatch'
         shell: pwsh
         run: Compress-Archive -Path ./apps/app1/* -DestinationPath ./app1.zip -Force
 
       - name: Upload app1 to S3
-        if: steps.filter.outputs.app1 == 'true' || github.event_name == 'workflow_dispatch'
         run: aws s3 cp ./app1.zip s3://${{ env.ARTIFACT_BUCKET }}/app1/app1.zip
 
       - name: Package app2
-        if: steps.filter.outputs.app2 == 'true' || github.event_name == 'workflow_dispatch'
         shell: pwsh
         run: Compress-Archive -Path ./apps/app2/* -DestinationPath ./app2.zip -Force
 
       - name: Upload app2 to S3
-        if: steps.filter.outputs.app2 == 'true' || github.event_name == 'workflow_dispatch'
         run: aws s3 cp ./app2.zip s3://${{ env.ARTIFACT_BUCKET }}/app2/app2.zip
 
   refresh-app1:
+    name: Refresh App1 ASG
     needs: build-and-upload
     runs-on: ubuntu-latest
     environment: dev
@@ -74,30 +61,31 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN_DEV }}
-          aws-region: us-east-1
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Start app1 instance refresh if none is running
+      - name: Start app1 instance refresh safely
         shell: bash
         run: |
           STATUS=$(aws autoscaling describe-instance-refreshes \
-            --auto-scaling-group-name mbodou-dev-app1-asg \
-            --region us-east-1 \
+            --auto-scaling-group-name "${{ env.APP1_ASG_NAME }}" \
+            --region "${{ env.AWS_REGION }}" \
             --query 'InstanceRefreshes[0].Status' \
             --output text 2>/dev/null || echo "NONE")
 
           echo "Current app1 refresh status: $STATUS"
 
           if [ "$STATUS" = "InProgress" ] || [ "$STATUS" = "Pending" ]; then
-            echo "Instance refresh already running for app1. Skipping new refresh."
+            echo "Instance refresh already running for app1. Skipping."
             exit 0
           fi
 
           aws autoscaling start-instance-refresh \
-            --auto-scaling-group-name mbodou-dev-app1-asg \
-            --region us-east-1 \
+            --auto-scaling-group-name "${{ env.APP1_ASG_NAME }}" \
+            --region "${{ env.AWS_REGION }}" \
             --preferences '{"MinHealthyPercentage":90,"InstanceWarmup":300}'
 
   refresh-app2:
+    name: Refresh App2 ASG
     needs: build-and-upload
     runs-on: ubuntu-latest
     environment: dev
@@ -107,25 +95,25 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN_DEV }}
-          aws-region: us-east-1
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Start app2 instance refresh if none is running
+      - name: Start app2 instance refresh safely
         shell: bash
         run: |
           STATUS=$(aws autoscaling describe-instance-refreshes \
-            --auto-scaling-group-name mbodou-dev-app2-asg \
-            --region us-east-1 \
+            --auto-scaling-group-name "${{ env.APP2_ASG_NAME }}" \
+            --region "${{ env.AWS_REGION }}" \
             --query 'InstanceRefreshes[0].Status' \
             --output text 2>/dev/null || echo "NONE")
 
           echo "Current app2 refresh status: $STATUS"
 
           if [ "$STATUS" = "InProgress" ] || [ "$STATUS" = "Pending" ]; then
-            echo "Instance refresh already running for app2. Skipping new refresh."
+            echo "Instance refresh already running for app2. Skipping."
             exit 0
           fi
 
           aws autoscaling start-instance-refresh \
-            --auto-scaling-group-name mbodou-dev-app2-asg \
-            --region us-east-1 \
+            --auto-scaling-group-name "${{ env.APP2_ASG_NAME }}" \
+            --region "${{ env.AWS_REGION }}" \
             --preferences '{"MinHealthyPercentage":90,"InstanceWarmup":300}'
