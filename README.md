@@ -28,20 +28,8 @@ The infrastructure follows Infrastructure as Code best practices with modular Te
 
 # Architecture Diagram
 
-Add your architecture image inside:
+<img width="1596" height="752" alt="Screenshot 2026-04-09 003542" src="https://github.com/user-attachments/assets/041e0f74-fa8c-45f9-b03c-e713453b8073" />
 
-```text
-docs/architecture-diagram.png
-```
-
-Then display it here:
-
-```markdown
-<img width="1596" height="752" alt="image" src="https://github.com/user-attachments/assets/6988c019-d968-47b0-b249-78e4f0bee1de" />
-
-```
-
----
 
 # High-Level Architecture
 
