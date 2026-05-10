@@ -37,7 +37,8 @@ docs/architecture-diagram.png
 Then display it here:
 
 ```markdown
-docs/Screenshot 2026-04-09 003542.png
+<img width="1596" height="752" alt="image" src="https://github.com/user-attachments/assets/6988c019-d968-47b0-b249-78e4f0bee1de" />
+
 ```
 
 ---
