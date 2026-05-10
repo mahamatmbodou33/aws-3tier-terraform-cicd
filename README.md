@@ -1,4 +1,4 @@
-# AWS 3-Tier Architecture with Terraform & CI/CD
+# Production-Style AWS 3-Tier Architecture with Terraform & CI/CD
 
 ## Project Overview
 
@@ -8,21 +8,41 @@ The infrastructure follows Infrastructure as Code best practices with modular Te
 
 ---
 
-# High-Level Architecture
+# Architecture Features
 
-Users access the application through Route 53 custom domains.
-
-Traffic flows through an Application Load Balancer using HTTPS with ACM certificates.
-
-The ALB uses host-based routing to direct traffic to different applications.
-
-The EC2 application servers run inside private subnets behind Auto Scaling Groups.
-
-AWS Systems Manager Session Manager is used for secure private EC2 access instead of SSH or bastion hosts.
+- Modular Terraform architecture
+- Dev and Prod environments
+- Remote Terraform state using S3 + DynamoDB
+- GitHub Actions CI/CD pipelines
+- OIDC authentication for secure AWS access
+- HTTPS using ACM + Route 53
+- Application Load Balancer with host-based routing
+- Auto Scaling Groups with Launch Templates
+- AWS Systems Manager Session Manager access
+- CloudWatch monitoring and alarms
+- SNS alert notifications
+- AWS WAF protection
+- Automated S3 artifact deployments
 
 ---
 
-# Request Flow
+# Architecture Diagram
+
+Add your architecture image inside:
+
+```text
+docs/architecture-diagram.png
+```
+
+Then display it here:
+
+```markdown
+docs/Screenshot 2026-04-09 003542.png
+```
+
+---
+
+# High-Level Architecture
 
 ```text
 User
@@ -42,7 +62,7 @@ Private EC2 Instances
 
 ---
 
-# 3-Tier VPC Design
+# 3-Tier Architecture Design
 
 ## Public Tier
 
@@ -81,7 +101,7 @@ Contains isolated database networking resources.
 
 # Host-Based Routing
 
-The Application Load Balancer uses host-based routing.
+The ALB uses host-based routing.
 
 ```text
 app1.mbodou.org → App1 Target Group
@@ -89,45 +109,9 @@ app2.mbodou.org → App2 Target Group
 mbodou.org      → Default Rule
 ```
 
-### Benefits
-- Multiple applications behind one ALB
-- Reduced infrastructure cost
-- Layer 7 routing demonstration
-- Cleaner architecture design
-
----
-
-# Auto Scaling & Self-Healing
-
-Each application runs behind its own Auto Scaling Group.
-
-### Features
-- High Availability
-- Self-Healing
-- Rolling Deployments
-- Automatic Instance Replacement
-
-If an instance becomes unhealthy, Auto Scaling automatically replaces it.
-
----
-
-# Secure Access with SSM
-
-The EC2 instances are deployed in private subnets without public IP addresses.
-
-AWS Systems Manager Session Manager is used instead of SSH.
-
-### Benefits
-- No inbound SSH ports
-- No bastion host required
-- More secure production access
-- Simplified administration
-
 ---
 
 # Terraform Modular Structure
-
-The infrastructure is organized using reusable Terraform modules.
 
 ## Modules
 
@@ -145,6 +129,8 @@ modules/
 └── WAF
 ```
 
+---
+
 ## Environments
 
 ```text
@@ -153,20 +139,14 @@ environments/
 └── prod
 ```
 
-### Benefits
-- Reusability
-- Scalability
-- Maintainability
-- Environment Separation
-- Production Readiness
-
 ---
 
 # Remote Terraform State
 
-Terraform state is stored remotely using Amazon S3.
+Terraform state is stored remotely using:
 
-DynamoDB is used for state locking.
+- Amazon S3 backend
+- DynamoDB state locking
 
 ```text
 Terraform
@@ -177,10 +157,11 @@ DynamoDB Lock Table
 ```
 
 ### Benefits
+
 - Centralized state management
 - Team collaboration
 - State locking protection
-- CI/CD integration
+- Safe CI/CD deployments
 
 ---
 
@@ -222,8 +203,6 @@ Production Infrastructure Updated
 
 # Application Deployment Pipeline
 
-Application deployments are separated from infrastructure deployments.
-
 ```text
 App Code Change
   ↓
@@ -250,7 +229,7 @@ s3://artifact-bucket/
 └── app2/app2.zip
 ```
 
-During instance bootstrap:
+During EC2 bootstrap:
 
 ```text
 EC2 User Data
@@ -271,13 +250,14 @@ ALB Health Check Passes
 CloudWatch is used for monitoring and alerting.
 
 ### Monitoring Includes
+
 - ALB Metrics
 - Auto Scaling Metrics
 - Target Group Health
 - EC2 Metrics
 - WAF Metrics
 
-### Alerting
+### Alerting Flow
 
 ```text
 CloudWatch Alarm
@@ -291,29 +271,15 @@ Email Alert
 
 # Security Features
 
-### Implemented Security Controls
 - Private EC2 Instances
+- No public SSH access
+- AWS Systems Manager Session Manager
 - Security Groups
-- No Public SSH Access
-- Systems Manager Session Manager
 - IAM Roles
-- OIDC Authentication
-- HTTPS with ACM
+- GitHub Actions OIDC Authentication
+- HTTPS using ACM
 - AWS WAF Protection
 - Terraform State Locking
-
----
-
-# Dev & Prod Environment Separation
-
-The project separates development and production environments.
-
-```text
-dev  → automatic deployment/testing
-prod → manual approval deployment
-```
-
-This demonstrates production-style CI/CD separation.
 
 ---
 
@@ -350,6 +316,16 @@ During this project, several real-world engineering issues were solved:
 - Auto Scaling instance refresh conflicts
 - S3 artifact deployment troubleshooting
 - Dev/prod naming conflicts
+
+---
+
+# Demo Video
+
+Add your LinkedIn or YouTube demo link here.
+
+```text
+[https://linkedin.com/](https://youtu.be/a3lh6fcN9O8)
+```
 
 ---
 
