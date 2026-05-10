@@ -11,9 +11,4 @@ vpc_create_database_subnet_group       = true
 vpc_create_database_subnet_route_table = true
 vpc_enable_nat_gateway                 = true
 vpc_single_nat_gateway                 = true
-ami_id                                 = "ami-0c3389a4fa5bddaad"
-domain_name                            = "mbodou.org"
-instance_type                          = "t3.micro"
-github_owner                           = "mahamatmbodou33"
-github_repo                            = "aws-3tier-terraform-cicd"
-alert_email                            = "mahamatmbodou33@gmail.com"
+
