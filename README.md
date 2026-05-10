@@ -1,26 +1,28 @@
-# Architecture Overview
+# AWS 3-Tier Architecture with Terraform & CI/CD
 
-## Project Summary
+## Project Overview
 
-This project is a production-style AWS 3-tier architecture built with Terraform and GitHub Actions CI/CD.
+This project demonstrates a production-style AWS 3-tier architecture built using Terraform and GitHub Actions CI/CD.
 
-The goal of the project is to demonstrate secure, scalable, and automated cloud infrastructure using real-world AWS services and Infrastructure as Code best practices.
-
----
-
-## High-Level Architecture
-
-Users access the application through custom domain names managed by Route 53. Route 53 resolves the domains to an Application Load Balancer.
-
-The Application Load Balancer handles HTTPS traffic using an ACM certificate and routes requests to the correct application using host-based routing.
-
-The application servers run on EC2 instances inside private subnets. These instances are managed by Auto Scaling Groups and are not directly accessible from the internet.
-
-AWS Systems Manager Session Manager is used for secure private instance access without SSH or a bastion host.
+The infrastructure follows Infrastructure as Code best practices with modular Terraform design, environment separation, automated deployments, monitoring, and secure networking.
 
 ---
 
-## Request Flow
+# High-Level Architecture
+
+Users access the application through Route 53 custom domains.
+
+Traffic flows through an Application Load Balancer using HTTPS with ACM certificates.
+
+The ALB uses host-based routing to direct traffic to different applications.
+
+The EC2 application servers run inside private subnets behind Auto Scaling Groups.
+
+AWS Systems Manager Session Manager is used for secure private EC2 access instead of SSH or bastion hosts.
+
+---
+
+# Request Flow
 
 ```text
 User
@@ -29,94 +31,107 @@ Route 53 DNS
   ↓
 Application Load Balancer HTTPS via ACM
   ↓
-AWS WAF attached to ALB
+AWS WAF
   ↓
 Target Groups
   ↓
 Auto Scaling Groups
   ↓
-Private EC2 Application Servers
-3-Tier VPC Design
+Private EC2 Instances
+```
 
-The VPC is designed across multiple Availability Zones and separated into three tiers.
+---
 
-Public Tier
+# 3-Tier VPC Design
 
-The public tier contains internet-facing resources.
+## Public Tier
 
-Components:
+Contains internet-facing resources.
 
-Application Load Balancer
-Internet Gateway
-NAT Gateway if enabled
-Public subnets across multiple Availability Zones
-Private Application Tier
+### Components
+- Application Load Balancer
+- Internet Gateway
+- Public Subnets
 
-The private application tier contains the application servers.
+---
 
-Components:
+## Private Application Tier
 
-EC2 instances
-Auto Scaling Groups
-Launch Templates
-Security groups allowing traffic only from the ALB
-SSM Session Manager access
-Database Tier
+Contains application servers.
 
-The database tier is isolated from public access.
+### Components
+- EC2 Instances
+- Auto Scaling Groups
+- Launch Templates
+- Security Groups
+- Systems Manager Session Manager
 
-Components:
+---
 
-Database subnets
-RDS-ready subnet group
-Security group-controlled access
-Load Balancer and Routing
+## Database Tier
 
-The Application Load Balancer uses host-based routing to serve multiple applications from a single ALB.
+Contains isolated database networking resources.
 
-Example routing:
+### Components
+- Database Subnets
+- RDS-ready subnet groups
+- Restricted Security Groups
 
-app1.mbodou.org → Target Group App1
-app2.mbodou.org → Target Group App2
-mbodou.org      → Default response
+---
 
-Benefits:
+# Host-Based Routing
 
-Supports multiple applications behind one load balancer
-Reduces cost compared to separate ALBs
-Demonstrates Layer 7 routing
-Allows clean domain-based service separation
-Auto Scaling and Self-Healing
+The Application Load Balancer uses host-based routing.
 
-Each application is deployed behind its own Auto Scaling Group.
+```text
+app1.mbodou.org → App1 Target Group
+app2.mbodou.org → App2 Target Group
+mbodou.org      → Default Rule
+```
 
-The Auto Scaling Groups provide:
+### Benefits
+- Multiple applications behind one ALB
+- Reduced infrastructure cost
+- Layer 7 routing demonstration
+- Cleaner architecture design
 
-High availability
-Automatic instance replacement
-Rolling deployment support
-Self-healing when instances become unhealthy
+---
 
-If an EC2 instance fails its ALB health check, the Auto Scaling Group can replace it automatically.
+# Auto Scaling & Self-Healing
 
-Secure Access with SSM
+Each application runs behind its own Auto Scaling Group.
 
-The EC2 instances are deployed in private subnets and do not require public IP addresses.
+### Features
+- High Availability
+- Self-Healing
+- Rolling Deployments
+- Automatic Instance Replacement
 
-Instead of SSH or a bastion host, this project uses AWS Systems Manager Session Manager.
+If an instance becomes unhealthy, Auto Scaling automatically replaces it.
 
-Benefits:
+---
 
-No inbound SSH required
-No bastion host to manage
-Secure access to private instances
-Better production security posture
-Terraform Modular Design
+# Secure Access with SSM
+
+The EC2 instances are deployed in private subnets without public IP addresses.
+
+AWS Systems Manager Session Manager is used instead of SSH.
+
+### Benefits
+- No inbound SSH ports
+- No bastion host required
+- More secure production access
+- Simplified administration
+
+---
+
+# Terraform Modular Structure
 
 The infrastructure is organized using reusable Terraform modules.
 
-Example module structure:
+## Modules
 
+```text
 modules/
 ├── acm
 ├── alb
@@ -128,102 +143,116 @@ modules/
 ├── security-groups
 ├── vpc
 └── WAF
+```
 
-Environment structure:
+## Environments
 
+```text
 environments/
 ├── dev
 └── prod
+```
 
-This design improves:
+### Benefits
+- Reusability
+- Scalability
+- Maintainability
+- Environment Separation
+- Production Readiness
 
-Maintainability
-Reusability
-Environment separation
-Team collaboration
-Production readiness
-Terraform Remote State
+---
+
+# Remote Terraform State
 
 Terraform state is stored remotely using Amazon S3.
 
 DynamoDB is used for state locking.
 
+```text
 Terraform
   ↓
-S3 Backend Bucket
+S3 Backend
   ↓
 DynamoDB Lock Table
+```
 
-Benefits:
+### Benefits
+- Centralized state management
+- Team collaboration
+- State locking protection
+- CI/CD integration
 
-Centralized state storage
-Safe collaboration
-Prevents concurrent Terraform runs
-Supports CI/CD pipelines
-CI/CD Architecture
+---
 
-This project includes separate CI/CD workflows for infrastructure and application deployments.
+# CI/CD Infrastructure Pipeline
 
-Infrastructure Pipeline
+## Development Pipeline
 
-Terraform workflows manage AWS infrastructure.
-
-Dev pipeline:
-
-Push to main
+```text
+Code Change
+  ↓
+GitHub Push
   ↓
 GitHub Actions
   ↓
 Terraform fmt
   ↓
-Terraform init
-  ↓
 Terraform validate
   ↓
 Terraform plan/apply
   ↓
-AWS infrastructure updated
+AWS Infrastructure Updated
+```
 
-Production pipeline:
+---
 
-Manual workflow trigger
+## Production Pipeline
+
+```text
+Manual Workflow Trigger
   ↓
-GitHub environment approval
+GitHub Environment Approval
   ↓
 Terraform plan/apply
   ↓
-Production infrastructure updated
-Application Deployment Pipeline
+Production Infrastructure Updated
+```
 
-Application code is packaged and deployed through S3 artifact storage.
+---
 
-App code change
+# Application Deployment Pipeline
+
+Application deployments are separated from infrastructure deployments.
+
+```text
+App Code Change
   ↓
 GitHub Actions
   ↓
-Build app1.zip and app2.zip
+Build ZIP Artifact
   ↓
-Upload artifacts to S3
+Upload to S3
   ↓
-Trigger Auto Scaling instance refresh
+Auto Scaling Instance Refresh
   ↓
-New EC2 instances download artifacts
-  ↓
-Application deployed
-Artifact Deployment
+New EC2 Instances Deploy Application
+```
 
-Application artifacts are stored in an S3 bucket.
+---
 
-Example structure:
+# Artifact Deployment
 
+Artifacts are stored inside Amazon S3.
+
+```text
 s3://artifact-bucket/
 ├── app1/app1.zip
 └── app2/app2.zip
+```
 
-During EC2 bootstrap, user data downloads the correct artifact from S3 and deploys it to Apache.
+During instance bootstrap:
 
-Example flow:
-
+```text
 EC2 User Data
   ↓
 Download ZIP from S3
@@ -232,96 +261,108 @@ Extract to /var/www/html
   ↓
 Start Apache
   ↓
-ALB health check passes
-Monitoring and Alerting
+ALB Health Check Passes
+```
 
-CloudWatch is used for monitoring application and infrastructure health.
+---
 
-Monitoring includes:
+# Monitoring & Alerting
 
-ALB metrics
-Target group health
-Auto Scaling activity
-WAF metrics
-EC2 visibility
+CloudWatch is used for monitoring and alerting.
 
-CloudWatch alarms can notify through SNS.
+### Monitoring Includes
+- ALB Metrics
+- Auto Scaling Metrics
+- Target Group Health
+- EC2 Metrics
+- WAF Metrics
 
-ALB / ASG / WAF
+### Alerting
+
+```text
+CloudWatch Alarm
   ↓
-CloudWatch Metrics
+SNS Notification
   ↓
-CloudWatch Alarms
-  ↓
-SNS Email Notification
-Security Features
+Email Alert
+```
 
-Security-focused design choices include:
+---
 
-Private EC2 instances
-No public SSH access
-SSM Session Manager access
-Security groups with restricted inbound access
-IAM roles for EC2 and GitHub Actions
-GitHub Actions OIDC authentication
-AWS WAF protection
-HTTPS using ACM
-Terraform state locking
-Dev and Prod Environments
+# Security Features
+
+### Implemented Security Controls
+- Private EC2 Instances
+- Security Groups
+- No Public SSH Access
+- Systems Manager Session Manager
+- IAM Roles
+- OIDC Authentication
+- HTTPS with ACM
+- AWS WAF Protection
+- Terraform State Locking
+
+---
+
+# Dev & Prod Environment Separation
 
 The project separates development and production environments.
 
-dev  → automatic testing and deployment
-prod → manual approval-based deployment
+```text
+dev  → automatic deployment/testing
+prod → manual approval deployment
+```
 
-Production uses GitHub Environment approval before deployment.
+This demonstrates production-style CI/CD separation.
 
-This provides a safer deployment model and demonstrates real-world CI/CD environment separation.
+---
 
-Key AWS Services Used
-VPC
-EC2
-Auto Scaling Groups
-Launch Templates
-Application Load Balancer
-Target Groups
-Route 53
-ACM
-S3
-DynamoDB
-IAM
-Systems Manager Session Manager
-CloudWatch
-SNS
-AWS WAF
-RDS-ready database subnets
-Challenges Solved
+# AWS Services Used
 
-During this project, several real-world issues were resolved:
+- VPC
+- EC2
+- Auto Scaling Groups
+- Launch Templates
+- Application Load Balancer
+- Route 53
+- ACM
+- IAM
+- S3
+- DynamoDB
+- Systems Manager
+- CloudWatch
+- SNS
+- AWS WAF
+- RDS
 
-Terraform backend configuration errors
-S3 state checksum mismatch
-DynamoDB state locking issues
-GitHub Actions OIDC trust policy errors
-IAM permission errors during Terraform plan/apply
-ALB target group health check failures
-S3 artifact bucket cleanup during destroy
-Auto Scaling instance refresh conflicts
-Dev/prod naming conflicts
-YAML indentation errors in GitHub Actions workflows
+---
 
-These challenges helped improve practical troubleshooting skills across AWS, Terraform, IAM, networking, and CI/CD.
+# Challenges Solved
 
-Final Outcome
+During this project, several real-world engineering issues were solved:
 
-This project demonstrates the ability to design, deploy, automate, monitor, and troubleshoot a production-style AWS environment using Terraform and GitHub Actions.
+- Terraform backend configuration issues
+- S3 state checksum mismatch
+- DynamoDB locking errors
+- IAM OIDC trust policy troubleshooting
+- ALB health check failures
+- GitHub Actions YAML issues
+- Auto Scaling instance refresh conflicts
+- S3 artifact deployment troubleshooting
+- Dev/prod naming conflicts
 
-It shows hands-on experience with:
+---
 
-Cloud infrastructure design
-Infrastructure as Code
-Secure networking
-CI/CD automation
-Monitoring and alerting
-Auto Scaling and self-healing
-Dev/prod environment separation
+# Final Outcome
+
+This project demonstrates hands-on experience with:
+
+- AWS Cloud Infrastructure
+- Infrastructure as Code
+- Terraform Modular Design
+- Remote State Management
+- CI/CD Automation
+- Monitoring & Alerting
+- Auto Scaling & Self-Healing
+- Secure Cloud Networking
+- Production-Style AWS Architecture
