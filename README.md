@@ -310,10 +310,8 @@ During this project, several real-world engineering issues were solved:
 
 # Demo Video
 
-Add your LinkedIn or YouTube demo link here.
-
 ```text
-[https://linkedin.com/](https://youtu.be/a3lh6fcN9O8)
+https://youtu.be/a3lh6fcN9O8
 ```
 
 ---
