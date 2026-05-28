@@ -20,8 +20,10 @@ resource "aws_iam_role" "github_actions_role" {
           }
 
           StringLike = {
-            # Allow all branches and tags for this repo
-            "token.actions.githubusercontent.com:sub" = "repo:${var.github_owner}/${var.github_repo}:*"
+            "token.actions.githubusercontent.com:sub" = [
+              "repo:mahamatmbodou33/aws-3tier-full-stuck:ref:refs/heads/main",
+              "repo:mahamatmbodou33/aws-3tier-full-stuck:ref:refs/heads/dev"
+            ]
           }
         }
       }
