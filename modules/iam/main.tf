@@ -20,6 +20,7 @@ resource "aws_iam_role" "github_actions_role" {
           }
 
           StringLike = {
+            # Allow all branches and tags for this repo
             "token.actions.githubusercontent.com:sub" = "repo:${var.github_owner}/${var.github_repo}:*"
           }
         }
@@ -27,7 +28,6 @@ resource "aws_iam_role" "github_actions_role" {
     ]
   })
 }
-
 resource "aws_iam_role" "ec2_app_role" {
   name = "${var.project_name}-${var.environment}-ec2-app-role"
 
