@@ -1,6 +1,6 @@
 resource "aws_route53_record" "root" {
   zone_id = var.zone_id
-  name    = "domain.com"
+  name    = "mbodou.org"
   type    = "A"
 
   alias {
@@ -13,7 +13,7 @@ resource "aws_route53_record" "root" {
 
 resource "aws_route53_record" "app1" {
   zone_id = var.zone_id
-  name    = "domain.com"
+  name    = "app1.mbodou.org"
   type    = "A"
 
   alias {
@@ -26,7 +26,7 @@ resource "aws_route53_record" "app1" {
 }
 resource "aws_route53_record" "app2" {
   zone_id = var.zone_id
-name    = "domain.com"
+name    = "app2.mbodou.org"
   type    = "A"
 
   alias {

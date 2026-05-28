@@ -11,4 +11,9 @@ vpc_create_database_subnet_group       = true
 vpc_create_database_subnet_route_table = true
 vpc_enable_nat_gateway                 = true
 vpc_single_nat_gateway                 = true
-
+alert_email = "mahamatmbodou33@gmail.com"
+ami_id = "ami-00e801948462f718a"
+github_owner = "mahamatmbodou33"
+github_repo = "aws-3tier-full-stuck"
+instance_type = "t3.micro"
+domain_name = "mbodou.org"

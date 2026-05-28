@@ -1,6 +1,6 @@
 resource "aws_acm_certificate" "this" {
-  domain_name               = "domainName.org"
-  subject_alternative_names = ["*.domainName.org"]
+  domain_name               = "mbodou.org"
+  subject_alternative_names = ["*.mbodou.org"]
   validation_method         = "DNS"
 
   tags = var.tags
