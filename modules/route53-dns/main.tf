@@ -26,7 +26,7 @@ resource "aws_route53_record" "app1" {
 }
 resource "aws_route53_record" "app2" {
   zone_id = var.zone_id
-name    = "app2.mbodou.org"
+  name    = "app2.mbodou.org"
   type    = "A"
 
   alias {
