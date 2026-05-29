@@ -1,28 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>App2</title>
-  <link rel="stylesheet" href="css/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App2 | Backend API Service</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>App2</h1>
-    <p>Backend demo application deployed with CI/CD on AWS</p>
-  </header>
 
-  <main>
-    <section class="card">
-      <h2>Application 2</h2>
-      <p>This application is independently deployed using the same Terraform module.</p>
-      <p>This is a simple test message for App2.</p>
-      
-      <button onclick="showMessage()">Check Service</button>
-      <p id="message"></p>
-    </section>
-  </main>
+<header class="hero">
+    <div class="container">
+        <span class="badge">App2 Backend Service</span>
+        <h1>Cloud API Service</h1>
+        <p>
+            A containerized backend-style service running on AWS infrastructure
+            with Terraform, CI/CD, Auto Scaling, monitoring, and secure deployment automation.
+        </p>
 
-  <script src="js/app.js"></script>
+        <div class="hero-buttons">
+            <a href="#status" class="btn primary">View Service Status</a>
+            <a href="#architecture" class="btn secondary">View Architecture</a>
+        </div>
+    </div>
+</header>
+
+<main>
+
+<section id="status" class="container">
+    <h2>Service Status</h2>
+
+    <div class="status-grid">
+        <div class="status-card healthy">
+            <h3>API Health</h3>
+            <p id="health-status">Checking...</p>
+        </div>
+
+        <div class="status-card">
+            <h3>Environment</h3>
+            <p>Development</p>
+        </div>
+
+        <div class="status-card">
+            <h3>Deployment</h3>
+            <p>Dockerized App</p>
+        </div>
+
+        <div class="status-card">
+            <h3>Runtime</h3>
+            <p>Amazon EC2 + Auto Scaling</p>
+        </div>
+    </div>
+</section>
+
+<section class="container">
+    <h2>Service Capabilities</h2>
+
+    <div class="feature-grid">
+        <div class="feature-card">
+            <h3>Containerized Deployment</h3>
+            <p>
+                App2 is packaged as a Docker container for consistent deployments
+                across local, development, and production environments.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <h3>CI/CD Automation</h3>
+            <p>
+                GitHub Actions automates build, test, artifact delivery, and
+                deployment workflows across AWS infrastructure.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <h3>High Availability</h3>
+            <p>
+                The service runs behind an Application Load Balancer and Auto Scaling
+                Group for improved availability and fault tolerance.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <h3>Monitoring & Alerts</h3>
+            <p>
+                CloudWatch dashboards and SNS notifications provide visibility into
+                infrastructure health and operational events.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section id="architecture" class="container">
+    <h2>Application Flow</h2>
+
+    <div class="flow">
+        <div>GitHub</div>
+        <span>→</span>
+        <div>GitHub Actions</div>
+        <span>→</span>
+        <div>Docker Image</div>
+        <span>→</span>
+        <div>AWS</div>
+        <span>→</span>
+        <div>ALB + ASG</div>
+    </div>
+</section>
+
+<section class="container">
+    <h2>API Endpoints</h2>
+
+    <div class="endpoint-card">
+        <p><strong>GET /</strong> — Service homepage</p>
+        <p><strong>GET /health</strong> — Health check endpoint</p>
+        <p><strong>GET /api/status</strong> — Service status response</p>
+        <p><strong>GET /api/profile</strong> — Cloud engineer profile data</p>
+    </div>
+</section>
+
+</main>
+
+<footer>
+    <p>© 2026 App2 Backend Service | Built by Mahamat Mbodou</p>
+</footer>
+
+<script src="script.js"></script>
 </body>
 </html>

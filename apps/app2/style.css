@@ -1,0 +1,159 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #0b1120;
+    color: #f8fafc;
+    line-height: 1.6;
+}
+
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.hero {
+    background: linear-gradient(135deg, #0f766e, #1e40af);
+    padding: 90px 20px;
+    text-align: center;
+}
+
+.badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    padding: 8px 14px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.hero p {
+    max-width: 760px;
+    margin: auto;
+    color: #dbeafe;
+    font-size: 1.15rem;
+}
+
+.hero-buttons {
+    margin-top: 30px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 22px;
+    border-radius: 6px;
+    text-decoration: none;
+    margin: 8px;
+    font-weight: bold;
+}
+
+.primary {
+    background: #ffffff;
+    color: #1e40af;
+}
+
+.secondary {
+    border: 1px solid #ffffff;
+    color: #ffffff;
+}
+
+section {
+    padding: 55px 0;
+}
+
+h2 {
+    color: #5eead4;
+    margin-bottom: 25px;
+}
+
+.status-grid,
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.status-card,
+.feature-card,
+.endpoint-card {
+    background: #1e293b;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+.status-card h3,
+.feature-card h3 {
+    color: #93c5fd;
+    margin-bottom: 10px;
+}
+
+.healthy {
+    border-left: 5px solid #22c55e;
+}
+
+.flow {
+    background: #1e293b;
+    padding: 25px;
+    border-radius: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+}
+
+.flow div {
+    background: #0f766e;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.flow span {
+    color: #5eead4;
+    font-size: 1.4rem;
+}
+
+.endpoint-card p {
+    margin-bottom: 12px;
+}
+
+footer {
+    text-align: center;
+    background: #020617;
+    color: #94a3b8;
+    padding: 25px;
+}
+
+@media (max-width: 900px) {
+    .status-grid,
+    .feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .hero h1 {
+        font-size: 2.3rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .status-grid,
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .flow {
+        flex-direction: column;
+    }
+}
