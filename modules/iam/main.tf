@@ -4,6 +4,7 @@ resource "aws_iam_role" "github_actions_role" {
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
+
     Statement = [
       {
         Effect = "Allow"
@@ -21,8 +22,8 @@ resource "aws_iam_role" "github_actions_role" {
 
           StringLike = {
             "token.actions.githubusercontent.com:sub" = [
-              "repo:mahamatmbodou33/aws-3tier-full-stuck:ref:refs/heads/main",
-              "repo:mahamatmbodou33/aws-3tier-full-stuck:ref:refs/heads/dev"
+              "repo:mahamatmbodou33/aws-3tier-full-stuck:ref:refs/heads/dev",
+              "repo:mahamatmbodou33/aws-3tier-full-stuck:ref:refs/heads/main"
             ]
           }
         }
