@@ -22,8 +22,8 @@ resource "aws_iam_role" "github_actions_role" {
 
           StringLike = {
             "token.actions.githubusercontent.com:sub" = [
-              "repo:mahamatmbodou33/aws-3tier-full-stuck:ref:refs/heads/dev",
-              "repo:mahamatmbodou33/aws-3tier-full-stuck:ref:refs/heads/main"
+              "repo:mahamatmbodou33/aws-3tier-terraform-cicd:*",
+              "repo:mahamatmbodou33/aws-3tier-terraform-cicd:environment:dev"
             ]
           }
         }
