@@ -45,10 +45,27 @@ module "alb" {
   tags            = local.common_tags
 }
 
+module "ecr" {
+  source = "../../modules/ecr"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+
 module "app1" {
   source                = "../../modules/app"
   name                  = "${var.project_name}-${var.environment}-app1"
   app_name              = "app1"
+  aws_region            = var.aws_region
+  aws_account_id        = "014498647009"
+  ecr_repo              = module.ecr.app1_repository_name
   ami_id                = var.ami_id
   instance_type         = var.instance_type
   subnet_ids            = module.vpc.private_subnets
@@ -75,6 +92,9 @@ module "app2" {
   source                = "../../modules/app"
   name                  = "${var.project_name}-${var.environment}-app2"
   app_name              = "app2"
+  aws_region            = var.aws_region
+  aws_account_id        = "014498647009"
+  ecr_repo              = module.ecr.app2_repository_name
   ami_id                = var.ami_id
   instance_type         = var.instance_type
   subnet_ids            = module.vpc.private_subnets
@@ -155,6 +175,22 @@ module "monitoring" {
   }
 }
 
+module "observability" {
+  source = "../../modules/observability"
+
+  project_name     = var.project_name
+  environment      = var.environment
+  aws_region       = var.aws_region
+  vpc_id           = module.vpc.vpc_id
+  public_subnet_id = module.vpc.public_subnets[0]
+
+  ami_id = var.ami_id
+
+  instance_profile_name = module.iam.instance_profile_name
+  gmail_app_password    = var.gmail_app_password
+  my_ip_cidr            = var.my_ip_cidr
+  tags                  = local.common_tags
+}
 ## S3 Bucket for Application Artifacts
 resource "aws_s3_bucket" "artifacts" {
   bucket = "${var.project_name}-${var.environment}-artifacts"

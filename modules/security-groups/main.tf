@@ -55,6 +55,14 @@ resource "aws_security_group" "app_sg" {
     security_groups = [aws_security_group.alb_sg.id]
   }
 
+ingress {
+  description = "Node Exporter from VPC"
+  from_port   = 9100
+  to_port     = 9100
+  protocol    = "tcp"
+  cidr_blocks = ["10.0.0.0/16"]
+}
+
   # Outbound (keep this)
   egress {
     from_port   = 0
@@ -62,6 +70,7 @@ resource "aws_security_group" "app_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
 }
 
 ########################################

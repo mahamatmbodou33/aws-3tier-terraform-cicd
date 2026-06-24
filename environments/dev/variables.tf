@@ -119,7 +119,13 @@ variable "alert_email" {
   type = string
 }
 
-# variable "web_acl_name" {
-#   type = string
-# }
+variable "my_ip_cidr" {
+  description = "My public IP for Grafana and Prometheus access"
+  type        = string
+}
+
+variable "gmail_app_password" {
+  type      = string
+  sensitive = true
+}
 

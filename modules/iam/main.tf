@@ -117,7 +117,17 @@ resource "aws_iam_policy" "github_actions_policy" {
           "dynamodb:*",
           "iam:*",
           "rds:*",
-          "sns:*"
+          "sns:*",
+          # ECR permissions for Docker pipeline
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:CompleteLayerUpload",
+          "ecr:InitiateLayerUpload",
+          "ecr:PutImage",
+          "ecr:UploadLayerPart",
+          "ecr:BatchGetImage",
+          "ecr:DescribeImages",
+          "ecr:DescribeRepositories"
         ]
         Resource = "*"
       }
@@ -130,3 +140,56 @@ resource "aws_iam_role_policy_attachment" "github_actions_attach" {
   policy_arn = aws_iam_policy.github_actions_policy.arn
 }
 
+resource "aws_iam_policy" "ec2_ecr_pull_policy" {
+  name = "${var.project_name}-${var.environment}-ec2-ecr-pull-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_attach_ecr_pull" {
+  role       = aws_iam_role.ec2_app_role.name
+  policy_arn = aws_iam_policy.ec2_ecr_pull_policy.arn
+}
+resource "aws_iam_policy" "ec2_prometheus_discovery_policy" {
+  name = "${var.project_name}-${var.environment}-ec2-prometheus-discovery-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:DescribeInstances",
+          "ec2:DescribeTags",
+          "ec2:DescribeAvailabilityZones"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_attach_prometheus_discovery" {
+  role       = aws_iam_role.ec2_app_role.name
+  policy_arn = aws_iam_policy.ec2_prometheus_discovery_policy.arn
+}
