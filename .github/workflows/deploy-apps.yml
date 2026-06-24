@@ -3,6 +3,7 @@ name: Deploy Docker Apps Dev
 on:
   push:
     branches:
+      - main
       - docker-dev
     paths:
       - 'apps/app1/**'
