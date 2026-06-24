@@ -27,11 +27,11 @@ resource "aws_security_group" "observability_sg" {
     cidr_blocks = ["10.0.0.0/16"]
   }
   ingress {
-  from_port   = 9093
-  to_port     = 9093
-  protocol    = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
-}
+    from_port   = 9093
+    to_port     = 9093
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   egress {
     from_port   = 0
@@ -54,11 +54,11 @@ resource "aws_instance" "observability" {
 
   associate_public_ip_address = true
 
-user_data = templatefile("${path.module}/monitoring-user-data.sh", {
-  aws_region  = var.aws_region
-  environment = var.environment
-   gmail_app_password = var.gmail_app_password
-})
+  user_data = templatefile("${path.module}/monitoring-user-data.sh", {
+    aws_region         = var.aws_region
+    environment        = var.environment
+    gmail_app_password = var.gmail_app_password
+  })
 
   tags = merge(var.tags, {
     Name = "${var.project_name}-${var.environment}-observability"

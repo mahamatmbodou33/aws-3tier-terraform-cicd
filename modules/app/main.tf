@@ -10,11 +10,11 @@ resource "aws_launch_template" "this" {
   vpc_security_group_ids = var.security_group_ids
 
   user_data = base64encode(templatefile("${path.module}/user_data.sh", {
-  aws_region     = var.aws_region
-  aws_account_id = var.aws_account_id
-  ecr_repo       = var.ecr_repo
-  app_name       = var.app_name
-}))
+    aws_region     = var.aws_region
+    aws_account_id = var.aws_account_id
+    ecr_repo       = var.ecr_repo
+    app_name       = var.app_name
+  }))
 
   tag_specifications {
     resource_type = "instance"
