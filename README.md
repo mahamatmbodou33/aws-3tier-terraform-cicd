@@ -49,14 +49,14 @@ The solution consists of four major layers:
 * Host-Based Routing
 
 ```
-app1.yourdomain.com
+app1.mbodou.org
             │
             ▼
        Target Group 1
             │
       App1 Auto Scaling Group
 
-app2.yourdomain.com
+app2.mbodou.org
             │
             ▼
        Target Group 2
