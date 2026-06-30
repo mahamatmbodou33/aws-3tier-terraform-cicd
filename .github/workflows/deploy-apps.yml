@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      
+      - docker-dev
     paths:
       - 'apps/app1/**'
       - 'apps/app2/**'
