@@ -14,12 +14,6 @@ docker network create monitoring || true
 
 cat > /opt/alertmanager/alertmanager.yml <<'EOF'
 global:
-  resolve_timeout: 5m
-  smtp_smarthost: 'smtp.gmail.com:587'
-  smtp_from: 'mahamatmbodou33@gmail.com'
-  smtp_auth_username: 'mahamatmbodou33@gmail.com'
-  smtp_auth_password: '${gmail_app_password}'
-  smtp_require_tls: true
 
 route:
   receiver: email-alerts
