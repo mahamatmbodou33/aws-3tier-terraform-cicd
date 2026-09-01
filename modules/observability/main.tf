@@ -8,7 +8,7 @@ resource "aws_security_group" "observability_sg" {
     from_port   = 3000
     to_port     = 3000
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.my_ip_cidr]
   }
 
   ingress {
@@ -16,7 +16,7 @@ resource "aws_security_group" "observability_sg" {
     from_port   = 9090
     to_port     = 9090
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.my_ip_cidr]
   }
 
   ingress {
@@ -30,7 +30,7 @@ resource "aws_security_group" "observability_sg" {
     from_port   = 9093
     to_port     = 9093
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.my_ip_cidr]
   }
 
   egress {

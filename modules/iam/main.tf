@@ -10,7 +10,7 @@ resource "aws_iam_role" "github_actions_role" {
         Effect = "Allow"
 
         Principal = {
-          Federated = aws_iam_openid_connect_provider.github.arn
+          Federated = local.github_oidc_provider_arn
         }
 
         Action = "sts:AssumeRoleWithWebIdentity"
@@ -83,6 +83,8 @@ resource "aws_iam_instance_profile" "ec2_app_profile" {
 }
 
 resource "aws_iam_openid_connect_provider" "github" {
+  count = var.create_oidc_provider ? 1 : 0
+
   url = "https://token.actions.githubusercontent.com"
 
   client_id_list = ["sts.amazonaws.com"]
@@ -92,6 +94,25 @@ resource "aws_iam_openid_connect_provider" "github" {
   ]
 }
 
+data "aws_iam_openid_connect_provider" "github" {
+  count = var.create_oidc_provider ? 0 : 1
+
+  url = "https://token.actions.githubusercontent.com"
+}
+
+locals {
+  github_oidc_provider_arn = var.create_oidc_provider ? aws_iam_openid_connect_provider.github[0].arn : data.aws_iam_openid_connect_provider.github[0].arn
+
+  iam_role_arn_prefix             = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.project_name}-${var.environment}-*"
+  iam_policy_arn_prefix           = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${var.project_name}-${var.environment}-*"
+  iam_instance_profile_arn_prefix = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:instance-profile/${var.project_name}-${var.environment}-*"
+  rds_arn_prefix                  = "arn:aws:rds:${var.aws_region}:${data.aws_caller_identity.current.account_id}:*:${var.project_name}-${var.environment}-*"
+  sns_arn_prefix                  = "arn:aws:sns:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${var.project_name}-${var.environment}-*"
+  dynamodb_lock_table_arn         = "arn:aws:dynamodb:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/${var.tf_lock_table_name}"
+  tf_state_bucket_arn             = "arn:aws:s3:::${var.tf_state_bucket_name}"
+}
+
+
 resource "aws_iam_policy" "github_actions_policy" {
   name = "${var.project_name}-${var.environment}-github-actions-policy"
 
@@ -99,6 +120,13 @@ resource "aws_iam_policy" "github_actions_policy" {
     Version = "2012-10-17"
     Statement = [
       {
+        # EC2 networking/compute, the ALB, Auto Scaling, DNS, ACM, WAF and
+        # CloudWatch/Logs are left as Resource "*" on purpose: most of their
+        # write and Describe/List actions don't support resource-level ARNs
+        # at all, so restricting Resource here would either be a no-op or
+        # break Terraform's normal plan/apply calls. Scoping these further
+        # needs tag-based (ABAC) conditions - a good next step beyond this.
+        Sid    = "BroadInfraServicesWithoutUsefulResourceScoping"
         Effect = "Allow"
         Action = [
           "ec2:*",
@@ -108,17 +136,74 @@ resource "aws_iam_policy" "github_actions_policy" {
           "acm:*",
           "wafv2:*",
           "cloudwatch:*",
-          "logs:*",
-          "iam:PassRole",
+          "logs:*"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid      = "IamScopedToThisProjectsResources"
+        Effect   = "Allow"
+        Action   = "iam:*"
+        Resource = [
+          local.iam_role_arn_prefix,
+          local.iam_policy_arn_prefix,
+          local.iam_instance_profile_arn_prefix
+        ]
+      },
+      {
+        Sid    = "IamReadOnlyAndAccountLevelActions"
+        Effect = "Allow"
+        Action = [
           "iam:GetRole",
           "iam:GetInstanceProfile",
-          "iam:CreateServiceLinkedRole",
-          "s3:*",
-          "dynamodb:*",
-          "iam:*",
-          "rds:*",
-          "sns:*",
-          # ECR permissions for Docker pipeline
+          "iam:ListRoles",
+          "iam:ListPolicies",
+          "iam:ListOpenIDConnectProviders",
+          "iam:GetOpenIDConnectProvider",
+          "iam:CreateServiceLinkedRole"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid      = "PassOnlyThisProjectsEc2Role"
+        Effect   = "Allow"
+        Action   = "iam:PassRole"
+        Resource = local.iam_role_arn_prefix
+      },
+      {
+        Sid    = "S3ScopedToStateAndArtifactBuckets"
+        Effect = "Allow"
+        Action = "s3:*"
+        Resource = [
+          local.tf_state_bucket_arn,
+          "${local.tf_state_bucket_arn}/*",
+          var.artifact_bucket_arn,
+          "${var.artifact_bucket_arn}/*"
+        ]
+      },
+      {
+        Sid      = "DynamoDbScopedToLockTable"
+        Effect   = "Allow"
+        Action   = "dynamodb:*"
+        Resource = local.dynamodb_lock_table_arn
+      },
+      {
+        Sid      = "RdsScopedToThisProject"
+        Effect   = "Allow"
+        Action   = "rds:*"
+        Resource = local.rds_arn_prefix
+      },
+      {
+        Sid      = "SnsScopedToThisProject"
+        Effect   = "Allow"
+        Action   = "sns:*"
+        Resource = local.sns_arn_prefix
+      },
+      {
+        # ECR permissions for Docker pipeline
+        Sid    = "EcrForDockerPipeline"
+        Effect = "Allow"
+        Action = [
           "ecr:GetAuthorizationToken",
           "ecr:BatchCheckLayerAvailability",
           "ecr:CompleteLayerUpload",

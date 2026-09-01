@@ -129,3 +129,10 @@ variable "gmail_app_password" {
   sensitive = true
 }
 
+variable "db_password" {
+  description = "Master password for the RDS instance (inject via TF_VAR_db_password, never commit a literal)"
+  type        = string
+  sensitive   = true
+}
+
+

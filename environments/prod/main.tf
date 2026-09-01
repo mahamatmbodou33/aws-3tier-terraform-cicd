@@ -19,13 +19,14 @@ module "vpc" {
 # IAM MODULES
 
 module "iam" {
-  source = "../../modules/iam"
-
-  project_name        = var.project_name
-  environment         = var.environment
-  github_owner        = var.github_owner
-  github_repo         = var.github_repo
-  artifact_bucket_arn = aws_s3_bucket.artifacts.arn
+  source               = "../../modules/iam"
+  aws_region           = var.aws_region
+  project_name         = var.project_name
+  environment          = var.environment
+  github_owner         = var.github_owner
+  github_repo          = var.github_repo
+  artifact_bucket_arn  = aws_s3_bucket.artifacts.arn
+  create_oidc_provider = false # dev already owns the account's GitHub OIDC provider
 }
 
 module "sg" {
@@ -46,10 +47,26 @@ module "alb" {
   tags            = local.common_tags
 }
 
+module "ecr" {
+  source = "../../modules/ecr"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  tags = {
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
 module "app1" {
   source                = "../../modules/app"
   name                  = "${var.project_name}-${var.environment}-app1"
   app_name              = "app1"
+  aws_region            = var.aws_region
+  aws_account_id        = data.aws_caller_identity.current.account_id
+  ecr_repo              = module.ecr.app1_repository_name
   ami_id                = var.ami_id
   instance_type         = var.instance_type
   subnet_ids            = module.vpc.private_subnets
@@ -73,9 +90,13 @@ module "app1" {
 
 
 module "app2" {
-  source                = "../../modules/app"
-  name                  = "${var.project_name}-${var.environment}-app2"
-  app_name              = "app2"
+  source         = "../../modules/app"
+  name           = "${var.project_name}-${var.environment}-app2"
+  app_name       = "app2"
+  aws_region     = var.aws_region
+  aws_account_id = data.aws_caller_identity.current.account_id
+  ecr_repo       = module.ecr.app2_repository_name
+
   ami_id                = var.ami_id
   instance_type         = var.instance_type
   subnet_ids            = module.vpc.private_subnets
@@ -105,6 +126,8 @@ module "rds" {
   name         = "${local.name_prefix}-db"
   db_subnets   = module.vpc.database_subnets
   db_sg_id     = module.sg.db_sg_id
+  db_password  = var.db_password
+  multi_az     = true
   tags         = local.common_tags
 }
 

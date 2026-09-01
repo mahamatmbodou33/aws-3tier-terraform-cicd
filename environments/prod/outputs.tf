@@ -35,3 +35,10 @@ output "azs" {
   description = "A list of availability zones spefified as argument to this module"
   value       = module.vpc.azs
 }
+output "app1_ecr_url" {
+  value = module.ecr.app1_repository_url
+}
+
+output "app2_ecr_url" {
+  value = module.ecr.app2_repository_url
+}

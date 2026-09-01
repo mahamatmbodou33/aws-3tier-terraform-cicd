@@ -119,6 +119,13 @@ variable "alert_email" {
   type = string
 }
 
+variable "db_password" {
+  description = "Master password for the RDS instance (inject via TF_VAR_db_password, never commit a literal)"
+  type        = string
+  sensitive   = true
+}
+
+
 # variable "web_acl_name" {
 #   type = string
 # }
