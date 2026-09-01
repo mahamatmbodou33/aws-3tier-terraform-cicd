@@ -15,8 +15,8 @@ variable "environment" {
 }
 variable "db_password" {
   description = "Master password for the RDS instance (inject via TF_VAR_db_password, never commit a literal)"
-  type = string
-  sensitive = true
+  type        = string
+  sensitive   = true
 }
 variable "multi_az" {
   description = "Whether to deploy the RDS instance across two AZs for high availability"

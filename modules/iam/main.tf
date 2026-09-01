@@ -141,9 +141,9 @@ resource "aws_iam_policy" "github_actions_policy" {
         Resource = "*"
       },
       {
-        Sid      = "IamScopedToThisProjectsResources"
-        Effect   = "Allow"
-        Action   = "iam:*"
+        Sid    = "IamScopedToThisProjectsResources"
+        Effect = "Allow"
+        Action = "iam:*"
         Resource = [
           local.iam_role_arn_prefix,
           local.iam_policy_arn_prefix,

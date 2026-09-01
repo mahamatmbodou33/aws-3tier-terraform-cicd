@@ -19,8 +19,8 @@ variable "github_repo" {
 }
 variable "create_oidc_provider" {
   description = "Whether this environment creates the GitHub OIDC provider (account-level singleton - only one environment should own it)"
-  type = bool
-  default = true
+  type        = bool
+  default     = true
 }
 
 variable "aws_region" {
