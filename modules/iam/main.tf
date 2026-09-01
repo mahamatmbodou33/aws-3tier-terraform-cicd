@@ -194,6 +194,17 @@ resource "aws_iam_policy" "github_actions_policy" {
         Resource = local.rds_arn_prefix
       },
       {
+        Sid    = "RdsDescribeRequiresWildcard"
+        Effect = "Allow"
+        Action = [
+          "rds:DescribeDBInstances",
+          "rds:DescribeDBSubnetGroups",
+          "rds:DescribeDBParameterGroups",
+          "rds:ListTagsForResource"
+        ]
+        Resource = "*"
+      },
+      {
         Sid      = "SnsScopedToThisProject"
         Effect   = "Allow"
         Action   = "sns:*"
@@ -212,7 +223,8 @@ resource "aws_iam_policy" "github_actions_policy" {
           "ecr:UploadLayerPart",
           "ecr:BatchGetImage",
           "ecr:DescribeImages",
-          "ecr:DescribeRepositories"
+          "ecr:DescribeRepositories",
+          "ecr:ListTagsForResource"
         ]
         Resource = "*"
       }
