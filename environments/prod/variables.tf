@@ -126,6 +126,7 @@ variable "db_password" {
 }
 
 
-# variable "web_acl_name" {
-#   type = string
-# }
+variable "my_ip_cidr" {
+  description = "My public IP for Grafana and Prometheus access"
+  type        = string
+}
