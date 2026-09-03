@@ -23,7 +23,7 @@ resource "aws_iam_role" "github_actions_role" {
           StringLike = {
             "token.actions.githubusercontent.com:sub" = [
               "repo:mahamatmbodou33/aws-3tier-terraform-cicd:*",
-              "repo:mahamatmbodou33/aws-3tier-terraform-cicd:environment:${var.environment}"
+              "repo:mahamatmbodou33/aws-3tier-terraform-cicd:environment:${var.github_environment_name}"
             ]
           }
         }

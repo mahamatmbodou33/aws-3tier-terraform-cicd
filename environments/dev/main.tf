@@ -19,14 +19,15 @@ module "vpc" {
 # IAM MODULES
 
 module "iam" {
-  source               = "../../modules/iam"
-  aws_region           = var.aws_region
-  project_name         = var.project_name
-  environment          = var.environment
-  artifact_bucket_arn  = aws_s3_bucket.artifacts.arn
-  github_owner         = var.github_owner
-  github_repo          = var.github_repo
-  create_oidc_provider = true # dev owns the account's GitHub OIDC provider
+  source                  = "../../modules/iam"
+  aws_region              = var.aws_region
+  project_name            = var.project_name
+  environment             = var.environment
+  artifact_bucket_arn     = aws_s3_bucket.artifacts.arn
+  github_owner            = var.github_owner
+  github_repo             = var.github_repo
+  create_oidc_provider    = true # dev owns the account's GitHub OIDC provider
+  github_environment_name = "dev"
 }
 
 module "sg" {

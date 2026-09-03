@@ -39,3 +39,7 @@ variable "tf_lock_table_name" {
   type        = string
   default     = "terraform-locks"
 }
+variable "github_environment_name" {
+  description = "The GitHub Environment name used in the OIDC trust policy (must match Settings > Environments in GitHub exactly)"
+  type        = string
+}
