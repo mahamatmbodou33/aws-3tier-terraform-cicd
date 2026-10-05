@@ -1,4 +1,4 @@
-name: Deploy Docker Apps Dev ###
+name: Deploy Docker Apps Dev 
 
 on:
   push:
