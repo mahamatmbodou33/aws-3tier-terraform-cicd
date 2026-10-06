@@ -17,7 +17,7 @@ permissions:
 
 env:
   AWS_REGION: us-east-1
-  AWS_ACCOUNT_ID: "014498647009"
+  AWS_ACCOUNT_ID: "#########"
   APP1_ECR_REPOSITORY: three-tier-app-dev-app1
   APP2_ECR_REPOSITORY: three-tier-app-dev-app2
   APP1_ASG_NAME: three-tier-app-dev-app1-asg
